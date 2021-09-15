@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Data visualisation with R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Javiera Benavente (Javi)" />
+    <script src="libs/header-attrs-2.10/header-attrs.js"></script>
+    <link href="libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Data visualisation with R
+### Javiera Benavente (Javi)
+### (updated: 2021-09-15)
+
+---
+
+
+      &lt;style type="text/css"&gt;
+.remark-slide-content {
+    font-size: 25px;
+    padding: 1em 2em 1em 2em;
+}
+&lt;/style&gt;      
+
+#Required packages
+
+- tidiverse (Includes packages ggplot2, dplyr and tidyr)
+- palmerpenguins
+
+
+
+
+```r
+#Install packages
+
+install.packages("tidyverse") # Ploting and data manipulation
+install.packages("palmerpenguins") # Dataset
+
+#Load packages
+
+library(tidyverse)
+library(palmerpenguins)
+
+```
+---
+# Data format
+.pull-left[ 
+- To use ggplot2 make sure your data is in **long** format
+
+- If you are not sure what that means check this [link](https://fromthebottomoftheheap.net/2019/10/25/pivoting-tidily/)
+
+]
+.right[ 
+&lt;img src="pivot.png" width="52%" /&gt;
+]
+
+---
+&lt;style type="text/css"&gt;
+pre {
+    max-width: 100%;
+    max-height: 210px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+}
+&lt;/style&gt;
+# The dataset
+
+.center[ 
+&lt;img src="penguins.png" width="35%" /&gt;
+]
+
+.pull-left[
+   [Palmer penguins website](https://allisonhorst.github.io/palmerpenguins/)
+]
+
+
+```r
+# Check the palmer penguins dataset
+str(penguins)
+```
+
+```
+## tibble [344 x 8] (S3: tbl_df/tbl/data.frame)
+##  $ species          : Factor w/ 3 levels "Adelie","Chinstrap",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ island           : Factor w/ 3 levels "Biscoe","Dream",..: 3 3 3 3 3 3 3 3 3 3 ...
+##  $ bill_length_mm   : num [1:344] 39.1 39.5 40.3 NA 36.7 39.3 38.9 39.2 34.1 42 ...
+##  $ bill_depth_mm    : num [1:344] 18.7 17.4 18 NA 19.3 20.6 17.8 19.6 18.1 20.2 ...
+##  $ flipper_length_mm: int [1:344] 181 186 195 NA 193 190 181 195 193 190 ...
+##  $ body_mass_g      : int [1:344] 3750 3800 3250 NA 3450 3650 3625 4675 3475 4250 ...
+##  $ sex              : Factor w/ 2 levels "female","male": 2 1 1 NA 1 2 1 2 NA NA ...
+##  $ year             : int [1:344] 2007 2007 2007 2007 2007 2007 2007 2007 2007 2007 ...
+```
+
+---
+# Preliminary data treatment
+
+
+```r
+# Remove NAs from data set
+penguins_nafree &lt;- penguins %&gt;% drop_na() #Uses dplyr and tidyr
+
+str(penguins_nafree)
+```
+
+```
+## tibble [333 x 8] (S3: tbl_df/tbl/data.frame)
+##  $ species          : Factor w/ 3 levels "Adelie","Chinstrap",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ island           : Factor w/ 3 levels "Biscoe","Dream",..: 3 3 3 3 3 3 3 3 3 3 ...
+##  $ bill_length_mm   : num [1:333] 39.1 39.5 40.3 36.7 39.3 38.9 39.2 41.1 38.6 34.6 ...
+##  $ bill_depth_mm    : num [1:333] 18.7 17.4 18 19.3 20.6 17.8 19.6 17.6 21.2 21.1 ...
+##  $ flipper_length_mm: int [1:333] 181 186 195 193 190 181 195 182 191 198 ...
+##  $ body_mass_g      : int [1:333] 3750 3800 3250 3450 3650 3625 4675 3200 3800 4400 ...
+##  $ sex              : Factor w/ 2 levels "female","male": 2 1 1 1 2 1 2 1 2 2 ...
+##  $ year             : int [1:333] 2007 2007 2007 2007 2007 2007 2007 2007 2007 2007 ...
+```
+
+---
+# GGPLOT2
+## How does it work?
+Every ggplot call needs at least 3 elements:
+ - data
+ - mapping (aesthetics)
+ - geometric representation (geom)
+
+---
+## Let's start with the data and mapping
+
+
+```r
+# Let's plot body mass as a function of penguin species 
+ggplot(data=penguins_nafree , mapping = aes(x=species, y=body_mass_g))
+```
+
+&lt;img src="ggplot_files/figure-html/unnamed-chunk-7-1.png" width="432" style="display: block; margin: auto;" /&gt;
+---
+## Let's add a geom
+
+- Let's do a boxplot with **geom_boxplot**
+
+
+```r
+# it is not necesary to write data and mapping, as ggplot knows
+# that first argument in function is the data and that aes correspond to mapping
+ggplot(data=penguins_nafree ,mapping =aes(x=species, y=body_mass_g)) + # + adds new layer
+geom_boxplot()
+```
+
+&lt;img src="ggplot_files/figure-html/unnamed-chunk-8-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+## Many ways to ggplot
+
+```r
+#Original
+ggplot(data=penguins_nafree ,mapping =aes(x=species, y=body_mass_g)) + 
+geom_boxplot()
+
+#Shorter alternative
+* ggplot(penguins_nafree, aes(x=species, y=body_mass_g)) + 
+* geom_boxplot()
+
+# Aesthetics can go inside each geom
+ggplot(penguins_nafree ) + 
+geom_boxplot(aes(x=species, y=body_mass_g))
+
+# Data and Aesthetics can go inside each geom
+ggplot() + 
+geom_boxplot(data=penguins_nafree, aes(x=species, y=body_mass_g))
+
+```
+
+&lt;img src="ggplot_files/figure-html/unnamed-chunk-9-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+## Other aesthetics
+
+- **color=** will change the color of the lines
+- **fill=** will fill each box with a different color
+
+Let's see differences between sexes for each species
+
+```r
+# Let's try with color
+ggplot(penguins_nafree, aes(x=species, y=body_mass_g, color=sex)) + 
+geom_boxplot()
+```
+
+&lt;img src="ggplot_files/figure-html/unnamed-chunk-10-1.png" width="360" style="display: block; margin: auto;" /&gt;
+More [aesthetic specifications](https://ggplot2.tidyverse.org/articles/ggplot2-specs.html) (not all apply for geom_boxplot)
+
+---
+## Add more geoms
+
+```r
+ggplot(penguins_nafree, aes(x=species, y=body_mass_g, color=sex)) + 
+geom_boxplot()+
+  geom_jitter() #Similar to geom_point but prevents points from overlapping
+```
+
+&lt;img src="ggplot_files/figure-html/unnamed-chunk-11-1.png" width="432" style="display: block; margin: auto;" /&gt;
+
+---
+# More geoms
+.center[
+&lt;img src="ggplot2_geoms.png" width="90%" /&gt;
+]
+
+## Even more [geoms and tools](https://www.r-graph-gallery.com/ggplot2-package.html) 
+
+---
+# Challenge
+
+Experiment with different geoms on the penguins_nafree dataset
+
+*(Maybe paste figures on shared googledocs or something similar for discussion)*
+
+---
+# Final idea
+
+*Fit linear model (not sure if to fit a simple lm or a mixed effects)*
+
+
+
+```r
+#Fit linear model----
+
+mod&lt;-lm(bill_depth_mm~bill_length_mm+species+sex,data=penguins_nafree) 
+
+#Calculate predictions for prediction line and confidence interval
+
+pred&lt;-predict(mod, interval="confidence")   
+
+head(pred) 
+ #fit= prediction line, 
+ #lwr= lower value of ci and 
+ #upr= upper value of ci
+
+#Bind columns with predictionsto dataframe
+penguins_pred&lt;-cbind(penguins_nafree,pred) 
+head(penguins_pred) 
+
+```
+---
+#Plot regression lines and confidence intervals
+
+```r
+#Plot----
+ggplot(penguins_pred, aes(x=bill_length_mm,y=bill_depth_mm, fill=sex)) +
+  facet_grid(species~.)+
+  geom_point(shape=21, alpha=0.8, size=1.2)+
+  geom_ribbon(aes(ymin=lwr, ymax=upr), alpha=0.5)+
+  geom_smooth(aes(y=fit, color=sex))+
+  labs(x= "Bill length (mm)", y="Bill depth (mm)")+
+  scale_color_manual("Sex",labels= c("F", "M"), values= c("brown2", "blue"))+
+  scale_fill_manual("Sex",labels= c("F", "M"), values= c("brown2", "blue"))+
+  theme_bw()+ 
+theme(panel.grid = element_blank(),text =element_text(size=10),
+legend.position=c(0.89,0.93),legend.direction = "horizontal",
+legend.margin = margin(0,0,0,0),
+legend.key.size = unit(0.4, "cm"))
+```
+
+&lt;img src="ggplot_files/figure-html/unnamed-chunk-14-1.png" width="432" style="display: block; margin: auto;" /&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
